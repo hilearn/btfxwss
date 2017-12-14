@@ -42,9 +42,7 @@ class BtfxWss:
         self.secret = secret if secret else ''
         self.subscribe_messages = set()
 
-        self.conn = WebSocketConnection(log_level=log_level,
-                                        on_reconnect=self._on_reconnect,
-                                        **wss_kwargs)
+        self.conn = WebSocketConnection(log_level=log_level, **wss_kwargs)
         if logging_file_handler is not None:
             self.conn.log.addHandler(logging_file_handler)
         self.queue_processor = QueueProcessor(self.conn.q,

@@ -29,7 +29,7 @@ class WebSocketConnection(Thread):
     """
     def __init__(self, *args, url=None, timeout=None,
                  reconnect_interval=None, log_level=None,
-                 on_reconnect=None, **kwargs):
+                 sslopt=None, on_reconnect=None, **kwargs):
         """Initialize a WebSocketConnection Instance.
 
         :param args: args for Thread.__init__()
