@@ -1,6 +1,10 @@
 # Import Built-Ins
 import logging
 import time
+import hmac
+import hashlib
+import ujson as json
+from collections import defaultdict
 
 # Import Homebrew
 from btfxwss.connection import WebSocketConnection
@@ -39,8 +43,10 @@ class BtfxWss:
         """
         self.key = key if key else ''
         self.secret = secret if secret else ''
+        self.subscribe_messages = set()
 
         self.conn = WebSocketConnection(log_level=log_level,
+                                        on_reconnect=self._on_reconnect,
                                         **wss_kwargs)
         if logging_file_handler is not None:
             self.conn.log.addHandler(logging_file_handler)
@@ -421,6 +427,7 @@ class BtfxWss:
         q = {'event': 'subscribe', 'channel': channel_name}
         q.update(**kwargs)
         log.debug("_subscribe: %s", q)
+        self.subscribe_messages.add(json.dumps(q))
         self.conn.send(**q)
         self.channel_configs[identifier] = q
 
@@ -431,6 +438,10 @@ class BtfxWss:
         q.update(kwargs)
         self.conn.send(**q)
         self.channel_configs.pop(identifier)
+
+    def _on_reconnect(self):
+        for elem in self.subscribe_messages:
+            self.conn.send(json.loads(elem))
 
     def config(self, decimals_as_strings=True, ts_as_dates=False,
                sequencing=False, **kwargs):
