@@ -1,10 +1,7 @@
 # Import Built-Ins
 import logging
 import time
-import hmac
-import hashlib
-import ujson as json
-from collections import defaultdict
+import json
 
 # Import Homebrew
 from btfxwss.connection import WebSocketConnection
