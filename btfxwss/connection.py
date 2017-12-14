@@ -5,7 +5,7 @@ import time
 import ssl
 import hashlib
 import hmac
-from multiprocessing import Queue
+from queue import Queue
 from threading import Thread, Event, Timer
 from collections import OrderedDict
 
@@ -29,7 +29,7 @@ class WebSocketConnection(Thread):
     """
     def __init__(self, *args, url=None, timeout=None,
                  reconnect_interval=None, log_level=None,
-                 sslopt=None, on_reconnect=None, **kwargs):
+                 sslopt=None, **kwargs):
         """Initialize a WebSocketConnection Instance.
 
         :param args: args for Thread.__init__()
@@ -78,11 +78,6 @@ class WebSocketConnection(Thread):
         if log_level == logging.DEBUG:
             websocket.enableTrace(True)
         self.log.setLevel(level=log_level if log_level else logging.INFO)
-
-        if on_reconnect is not None:
-            self.on_reconnect = on_reconnect
-        else:
-            self.on_reconnect = lambda: None
 
         # Call init of Thread and pass remaining args and kwargs
         Thread.__init__(self)
@@ -196,7 +191,6 @@ class WebSocketConnection(Thread):
         if self.reconnect_required.is_set():
             self.log.info("_on_open(): Connection reconnected, re-subscribing..")
             self._resubscribe(soft=False)
-            self.on_reconnect()
 
     def _on_error(self, ws, error):
         self.log.info("Connection Error - %s", error)
